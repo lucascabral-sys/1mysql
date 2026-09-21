@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevLogin Studio - Página de Login Responsiva & VS Code Starter</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Prism.js for VS Code Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        code, pre {
+            font-family: 'Fira Code', monospace !important;
+        }
+
+        /* Glassmorphism effects */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Gradient mesh animation background */
+        .bg-mesh {
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.25) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.2) 0px, transparent 50%);
+        }
+
+        .light .bg-mesh {
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+
+        /* Input glow animation */
+        .input-field:focus-within {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Spinner animation */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-fast {
+            animation: spin 0.6s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-mesh min-h-screen text-slate-800 dark:text-slate-100 flex flex-col transition-colors duration-300">
+
+    <!-- Application Header Navigation -->
+    <header class="sticky top-0 z-40 w-full border-b border-slate-200/50 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/80 backdrop-blur-md px-4 lg:px-8 py-3 flex items-center justify-between shadow-sm">
+        <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-code text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight tracking-tight">DevLogin <span class="text-indigo-500 dark:text-indigo-400">Studio</span></h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Pronto para desenvolvimento no VS Code</p>
+            </div>
+        </div>
+
+        <!-- Mode Switcher Tabs (Desktop) -->
+        <div class="hidden md:flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700/60">
+            <button id="mode-preview-btn" onclick="switchViewMode('preview')" class="view-mode-btn px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-2 transition-all bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm">
+                <i class="fa-solid fa-desktop"></i>
+                <span>Preview Ao Vivo</span>
+            </button>
+            <button id="mode-code-btn" onclick="switchViewMode('code')" class="view-mode-btn px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                <i class="fa-solid fa-folder-tree"></i>
+                <span>Arquivos VS Code</span>
+            </button>
+            <button id="mode-split-btn" onclick="switchViewMode('split')" class="view-mode-btn px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                <i class="fa-solid fa-columns"></i>
+                <span>Lado a Lado</span>
+            </button>
+        </div>
+
+        <!-- Global Theme Toggle & Mobile Menu -->
+        <div class="flex items-center space-x-3">
+            <button id="theme-toggle" onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-slate-700" title="Alternar Tema Claro/Escuro">
+                <i id="theme-icon" class="fa-solid fa-moon"></i>
+            </button>
+
+            <!-- Mobile View Switcher Modal Trigger -->
+            <div class="md:hidden flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                <button onclick="switchViewMode('preview')" class="px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-600 text-white">Preview</button>
+                <button onclick="switchViewMode('code')" class="px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300">Código</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="flex-1 p-4 md:p-6 lg:p-8 max-w-[1700px] w-full mx-auto flex flex-col justify-center">
+        
+        <div id="workspace-container" class="grid grid-cols-1 gap-6 w-full items-start transition-all duration-300">
+            
+            <!-- SECTION 1: LIVE PREVIEW CONTAINER -->
+            <section id="preview-section" class="w-full flex flex-col items-center justify-center min-h-[600px] p-2 md:p-6 relative">
+                
+                <!-- Live Preview Indicator Tag -->
+                <div class="absolute top-0 left-2 md:left-6 flex items-center space-x-2 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>Preview Interativo Ao Vivo</span>
+                </div>
+
+                <!-- Modern Glass Login Card -->
+                <div class="w-full max-w-md glass-card rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden my-6 border">
+                    
+                    <!-- Top Accent Light Glow -->
+                    <div class="absolute -top-12 -left-12 w-40 h-40 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="absolute -bottom-12 -right-12 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <!-- Header Form -->
+                    <div class="text-center mb-8 relative z-10">
+                        <div class="inline-flex p-3 rounded-2xl bg-indigo-50 dark:bg-slate-800/80 border border-indigo-100 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 mb-3 shadow-inner">
+                            <i class="fa-solid fa-lock text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold tracking-tight">Bem-vindo de volta!</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Insira suas credenciais para acessar a conta</p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form id="live-login-form" onsubmit="handleFormSubmit(event)" class="space-y-5 relative z-10" novalidate>
+                        
+                        <!-- Field 1: Email/Username -->
+                        <div>
+                            <label for="live-email" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                                E-mail ou Usuário
+                            </label>
+                            <div class="relative rounded-xl input-field transition-all bg-white/80 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 focus-within:border-indigo-500 dark:focus-within:border-indigo-400">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-regular fa-envelope text-sm"></i>
+                                </div>
+                                <input 
+                                    type="email" 
+                                    id="live-email" 
+                                    name="email"
+                                    placeholder="seu.email@exemplo.com" 
+                                    oninput="validateEmailField()"
+                                    class="w-full pl-10 pr-4 py-3 bg-transparent rounded-xl text-sm outline-none placeholder-slate-400 text-slate-800 dark:text-slate-100"
+                                >
+                            </div>
+                            <p id="email-error" class="text-xs text-rose-500 mt-1.5 hidden flex items-center space-x-1">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span>Por favor, insira um e-mail válido.</span>
+                            </p>
+                        </div>
+
+                        <!-- Field 2: Password with Toggle Eye -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label for="live-password" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                                    Senha
+                                </label>
+                                <a href="javascript:void(0)" onclick="openForgotPasswordModal()" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                    Esqueceu a senha?
+                                </a>
+                            </div>
+                            <div class="relative rounded-xl input-field transition-all bg-white/80 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 focus-within:border-indigo-500 dark:focus-within:border-indigo-400">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-key text-sm"></i>
+                                </div>
+                                <input 
+                                    type="password" 
+                                    id="live-password" 
+                                    name="password"
+                                    placeholder="••••••••" 
+                                    oninput="validatePasswordField()"
+                                    class="w-full pl-10 pr-11 py-3 bg-transparent rounded-xl text-sm outline-none placeholder-slate-400 text-slate-800 dark:text-slate-100"
+                                >
+                                <button 
+                                    type="button" 
+                                    onclick="togglePasswordVisibility('live-password', 'eye-icon')" 
+                                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-indigo-500 focus:outline-none transition-colors"
+                                    title="Mostrar/Ocultar Senha"
+                                >
+                                    <i id="eye-icon" class="fa-regular fa-eye text-sm"></i>
+                                </button>
+                            </div>
+                            <p id="password-error" class="text-xs text-rose-500 mt-1.5 hidden flex items-center space-x-1">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span>A senha deve ter pelo menos 6 caracteres.</span>
+                            </p>
+                        </div>
+
+                        <!-- Checkbox: Remember Me -->
+                        <div class="flex items-center justify-between pt-1">
+                            <label class="flex items-center space-x-2.5 cursor-pointer group">
+                                <input type="checkbox" id="remember-me" class="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 transition cursor-pointer">
+                                <span class="text-xs text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Lembrar de mim</span>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button 
+                            type="submit" 
+                            id="submit-btn" 
+                            class="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all flex items-center justify-center space-x-2"
+                        >
+                            <span id="btn-text">Entrar na Conta</span>
+                            <i id="btn-icon" class="fa-solid fa-arrow-right text-xs"></i>
+                            <div id="btn-spinner" class="hidden">
+                                <i class="fa-solid fa-circle-notch animate-spin-fast text-base"></i>
+                            </div>
+                        </button>
+
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="my-6 flex items-center space-x-3">
+                        <div class="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400">ou acesse com</span>
+                        <div class="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
+                    </div>
+
+                    <!-- Social Buttons -->
+                    <div class="grid grid-cols-2 gap-3 relative z-10">
+                        <button onclick="showToast('Login via Google simulado!', 'info')" type="button" class="flex items-center justify-center space-x-2 py-2.5 px-4 bg-white/60 dark:bg-slate-800/60 hover:bg-white dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all shadow-sm">
+                            <i class="fa-brands fa-google text-red-500"></i>
+                            <span>Google</span>
+                        </button>
+                        <button onclick="showToast('Login via GitHub simulado!', 'info')" type="button" class="flex items-center justify-center space-x-2 py-2.5 px-4 bg-white/60 dark:bg-slate-800/60 hover:bg-white dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all shadow-sm">
+                            <i class="fa-brands fa-github text-slate-900 dark:text-white"></i>
+                            <span>GitHub</span>
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SECTION 2: VS CODE SOURCE CODE EXPLORER -->
+            <section id="code-section" class="w-full flex flex-col hidden transition-all">
+                
+                <!-- VS Code Window Container -->
+                <div class="w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-[#1e1e1e] text-slate-300">
+                    
+                    <!-- Window Top Title Bar -->
+                    <div class="bg-[#252526] px-4 py-2.5 border-b border-[#333333] flex items-center justify-between select-none">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                            <span class="ml-2 text-xs font-mono text-slate-400 hidden sm:inline">projeto-login — Visual Studio Code</span>
+                        </div>
+
+                        <!-- Main Action: Copy Current File -->
+                        <button onclick="copyCurrentCode()" class="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg transition-all shadow-md font-medium">
+                            <i id="copy-btn-icon" class="fa-regular fa-copy"></i>
+                            <span id="copy-btn-text">Copiar Código do Arquivo</span>
+                        </button>
+                    </div>
+
+                    <!-- File Tabs Bar -->
+                    <div class="bg-[#2d2d2d] flex border-b border-[#333333] overflow-x-auto text-xs font-mono">
+                        <button id="tab-html" onclick="setActiveCodeTab('html')" class="code-tab active-tab px-4 py-2.5 flex items-center space-x-2 border-r border-[#333333] bg-[#1e1e1e] text-amber-400 border-t-2 border-t-amber-500 font-semibold">
+                            <i class="fa-brands fa-html5 text-amber-500 text-sm"></i>
+                            <span>index.html</span>
+                        </button>
+                        <button id="tab-css" onclick="setActiveCodeTab('css')" class="code-tab px-4 py-2.5 flex items-center space-x-2 border-r border-[#333333] bg-[#2d2d2d] text-slate-400 hover:text-slate-200 border-t-2 border-t-transparent">
+                            <i class="fa-brands fa-css3-alt text-blue-400 text-sm"></i>
+                            <span>style.css</span>
+                        </button>
+                        <button id="tab-js" onclick="setActiveCodeTab('js')" class="code-tab px-4 py-2.5 flex items-center space-x-2 border-r border-[#333333] bg-[#2d2d2d] text-slate-400 hover:text-slate-200 border-t-2 border-t-transparent">
+                            <i class="fa-brands fa-square-js text-yellow-400 text-sm"></i>
+                            <span>script.js</span>
+                        </button>
+                    </div>
+
+                    <!-- Instruction Banner inside Code Panel -->
+                    <div class="bg-[#252526] px-4 py-2 text-xs text-slate-400 border-b border-[#333333] flex items-center justify-between">
+                        <span class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-info text-indigo-400"></i>
+                            <span>Crie estes arquivos na mesma pasta no VS Code e abra o <code class="text-amber-300">index.html</code> no seu navegador!</span>
+                        </span>
+                        <span id="file-size-badge" class="text-[10px] font-mono bg-[#333333] px-2 py-0.5 rounded text-slate-300">HTML5</span>
+                    </div>
+
+                    <!-- Code Viewer Screen -->
+                    <div class="relative max-h-[550px] overflow-auto p-4 bg-[#1e1e1e]">
+                        <pre id="code-display" class="!bg-transparent !m-0 !p-0"><code id="code-content" class="language-html"></code></pre>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl transform scale-95 transition-transform duration-300" id="forgot-modal-card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100 flex items-center space-x-2">
+                    <i class="fa-solid fa-key text-indigo-500"></i>
+                    <span>Recuperar Senha</span>
+                </h3>
+                <button onclick="closeForgotPasswordModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                Digite seu e-mail cadastrado. Enviaremos um link de redefinição de senha para você.
+            </p>
+            <form onsubmit="handleForgotSubmit(event)" class="space-y-4">
+                <div>
+                    <input type="email" id="forgot-email" required placeholder="seu.email@exemplo.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeForgotPasswordModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md">Enviar Link</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Prism JS for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+    <!-- Main Interactive JavaScript -->
+    <script>
+        
+        // Code Storage for VS Code tabs
+        const sourceCodes = {
+            html: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Login</title>
+    <!-- Estilos CSS Externo -->
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-card">
+            
+            <!-- Cabeçalho do Card -->
+            <div class="card-header">
+                <div class="icon-box">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2>Bem-vindo de volta!</h2>
+                <p>Insira suas credenciais para acessar a conta</p>
+            </div>
+
+            <!-- Formulário de Login -->
+            <form id="loginForm" novalidate>
+                
+                <!-- Campo E-mail -->
+                <div class="form-group">
+                    <label for="email">E-mail ou Usuário</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input type="email" id="email" placeholder="seu.email@exemplo.com" required>
+                    </div>
+                    <span class="error-message" id="emailError">Insira um e-mail válido.</span>
+                </div>
+
+                <!-- Campo Senha -->
+                <div class="form-group">
+                    <div class="label-row">
+                        <label for="password">Senha</label>
+                        <a href="#" class="forgot-link">Esqueceu a senha?</a>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key input-icon"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fa-regular fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="passwordError">A senha deve ter pelo menos 6 caracteres.</span>
+                </div>
+
+                <!-- Lembrar de mim -->
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <span>Lembrar de mim</span>
+                    </label>
+                </div>
+
+                <!-- Botão Enviar -->
+                <button type="submit" id="submitBtn" class="btn-submit">
+                    <span id="btnText">Entrar na Conta</span>
+                    <i class="fa-solid fa-arrow-right" id="btnIcon"></i>
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Script JavaScript Externo -->
+    <script src="script.js"><\/script>
+</body>
+</html>`,
